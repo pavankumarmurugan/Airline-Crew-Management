@@ -8,11 +8,11 @@
 		<version>3.2.1</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.airline.management</groupId>
-	<artifactId>AirlineManagement</artifactId>
+	<groupId>com.airline.crew.management</groupId>
+	<artifactId>AirlineCrewManagement</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>AirlineManagement</name>
-	<description>Project for Airline Management</description>
+	<name>AirlineCrewManagement</name>
+	<description>Demo project for Airline Crew Management</description>
 	<properties>
 		<java.version>17</java.version>
 	</properties>

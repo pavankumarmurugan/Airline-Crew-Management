@@ -1,13 +1,13 @@
-package com.airline.management;
+package com.airline.crew.management;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class AirlineManagementApplication {
+public class AirlineCrewManagementApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(AirlineManagementApplication.class, args);
+		SpringApplication.run(AirlineCrewManagementApplication.class, args);
 	}
 
 }

@@ -1,10 +1,10 @@
-package com.airline.management;
+package com.airline.crew.management;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class AirlineManagementApplicationTests {
+class AirlineCrewManagementApplicationTests {
 
 	@Test
 	void contextLoads() {
