@@ -58,7 +58,13 @@ public class UserEntity implements UserDetails{
     private Role userRole;
     
     @Column(name = "user_status", nullable=false)
-    private boolean userStatus = Boolean.FALSE;
+    private boolean userStatus = Boolean.TRUE;
+    
+    @Column(name = "user_mobile_no")
+    private String userMobileNo;
+    
+    @Column(name = "user_base_location")
+    private String userBaseLocation;
 
 	public Long getUserId() {
 		return userId;
@@ -149,6 +155,26 @@ public class UserEntity implements UserDetails{
 	@Override
 	public boolean isEnabled() {
 		return userStatus;
+	}
+
+	public String getUserMobileNo() {
+		return userMobileNo;
+	}
+
+	public void setUserMobileNo(String userMobileNo) {
+		this.userMobileNo = userMobileNo;
+	}
+
+	public String getUserBaseLocation() {
+		return userBaseLocation;
+	}
+
+	public void setUserBaseLocation(String userBaseLocation) {
+		this.userBaseLocation = userBaseLocation;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
 	}
     
 }
