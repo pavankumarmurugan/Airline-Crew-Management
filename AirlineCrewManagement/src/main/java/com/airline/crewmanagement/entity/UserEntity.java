@@ -156,5 +156,25 @@ public class UserEntity implements UserDetails{
 	public boolean isEnabled() {
 		return userStatus;
 	}
+
+	public String getUserMobileNo() {
+		return userMobileNo;
+	}
+
+	public void setUserMobileNo(String userMobileNo) {
+		this.userMobileNo = userMobileNo;
+	}
+
+	public String getUserBaseLocation() {
+		return userBaseLocation;
+	}
+
+	public void setUserBaseLocation(String userBaseLocation) {
+		this.userBaseLocation = userBaseLocation;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
     
 }
