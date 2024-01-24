@@ -7,7 +7,7 @@ import com.airline.crewmanagement.response.UserSignInResponse;
 
 public interface UserService {
 	
-	UserRegisterResponse registerUser(UserRegisterRequest userRegisterRequest);
+	UserRegisterResponse registerUser(UserRegisterRequest userRegisterRequest, String token);
 	
 	UserSignInResponse userSignIn(UserSignInRequest userSignInRequest);
 	

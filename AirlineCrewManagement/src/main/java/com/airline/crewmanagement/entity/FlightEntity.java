@@ -1,7 +1,7 @@
 package com.airline.crewmanagement.entity;
 
 import java.time.DayOfWeek;
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.EnumSet;
 
 import jakarta.persistence.CollectionTable;
@@ -53,10 +53,10 @@ public class FlightEntity {
     private AirportEntity flightDestinationAirport;
 	
 	@Column(name = "flight_departure_time", nullable=false)
-    private LocalDateTime flightDepartureTime;
+    private LocalTime flightDepartureTime;
 	
 	@Column(name = "flight_arrival_time", nullable=false)
-    private LocalDateTime flightArrivalTime;
+    private LocalTime flightArrivalTime;
 	
 	@ElementCollection(targetClass = DayOfWeek.class, fetch = FetchType.EAGER)
 	@CollectionTable(name = "tb004_flight_operating_days", joinColumns = @JoinColumn(name = "flight_id"))
@@ -96,19 +96,19 @@ public class FlightEntity {
 		this.flightDestinationAirport = flightDestinationAirport;
 	}
 
-	public LocalDateTime getFlightDepartureTime() {
+	public LocalTime getFlightDepartureTime() {
 		return flightDepartureTime;
 	}
 
-	public void setFlightDepartureTime(LocalDateTime flightDepartureTime) {
+	public void setFlightDepartureTime(LocalTime flightDepartureTime) {
 		this.flightDepartureTime = flightDepartureTime;
 	}
 
-	public LocalDateTime getFlightArrivalTime() {
+	public LocalTime getFlightArrivalTime() {
 		return flightArrivalTime;
 	}
 
-	public void setFlightArrivalTime(LocalDateTime flightArrivalTime) {
+	public void setFlightArrivalTime(LocalTime flightArrivalTime) {
 		this.flightArrivalTime = flightArrivalTime;
 	}
 

@@ -14,6 +14,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.Email;
@@ -60,11 +62,12 @@ public class UserEntity implements UserDetails{
     @Column(name = "user_status", nullable=false)
     private boolean userStatus = Boolean.TRUE;
     
-    @Column(name = "user_mobile_no")
-    private String userMobileNo;
+    @Column(name = "user_mobile_number")
+    private String userMobileNumber;
     
-    @Column(name = "user_base_location")
-    private String userBaseLocation;
+    @ManyToOne
+	@JoinColumn(name = "user_base_location", nullable = false)
+    private AirportEntity userBaseLocation;
 
 	public Long getUserId() {
 		return userId;
@@ -157,24 +160,24 @@ public class UserEntity implements UserDetails{
 		return userStatus;
 	}
 
-	public String getUserMobileNo() {
-		return userMobileNo;
-	}
-
-	public void setUserMobileNo(String userMobileNo) {
-		this.userMobileNo = userMobileNo;
-	}
-
-	public String getUserBaseLocation() {
+	public AirportEntity getUserBaseLocation() {
 		return userBaseLocation;
 	}
 
-	public void setUserBaseLocation(String userBaseLocation) {
+	public void setUserBaseLocation(AirportEntity userBaseLocation) {
 		this.userBaseLocation = userBaseLocation;
 	}
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
+	}
+
+	public String getUserMobileNumber() {
+		return userMobileNumber;
+	}
+
+	public void setUserMobileNumber(String userMobileNumber) {
+		this.userMobileNumber = userMobileNumber;
 	}
     
 }

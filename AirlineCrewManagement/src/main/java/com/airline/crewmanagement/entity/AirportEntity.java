@@ -33,6 +33,9 @@ public class AirportEntity {
 	@Column(name = "airport_name", nullable=false)
     private String airportName;
 	
+	@Column(name = "airport_code", nullable=false)
+    private String airportCode;
+	
 	@Column(name = "airport_country", nullable=false)
     private String airportCountry;
 	
@@ -84,6 +87,14 @@ public class AirportEntity {
 
 	public void setAirportCity(String airportCity) {
 		this.airportCity = airportCity;
+	}
+
+	public String getAirportCode() {
+		return airportCode;
+	}
+
+	public void setAirportCode(String airportCode) {
+		this.airportCode = airportCode;
 	}
 
 }
