@@ -2,14 +2,13 @@ package com.airline.crewmanagement.entity;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
-import java.util.EnumSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -58,12 +57,11 @@ public class FlightEntity {
 	@Column(name = "flight_arrival_time", nullable=false)
     private LocalTime flightArrivalTime;
 	
-	@ElementCollection(targetClass = DayOfWeek.class, fetch = FetchType.EAGER)
+	@ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(name = "tb004_flight_operating_days", joinColumns = @JoinColumn(name = "flight_id"))
 	@Column(name = "flight_operating_days", nullable=false)
-    @Enumerated(EnumType.STRING)
-    private EnumSet<DayOfWeek> flightOperatingDays;
-
+    private Set<String> flightOperatingDays;
+	
 	public Long getFlightId() {
 		return flightId;
 	}
@@ -112,16 +110,20 @@ public class FlightEntity {
 		this.flightArrivalTime = flightArrivalTime;
 	}
 
-	public EnumSet<DayOfWeek> getFlightOperatingDays() {
-		return flightOperatingDays;
-	}
-
-	public void setFlightOperatingDays(EnumSet<DayOfWeek> flightOperatingDays) {
-		this.flightOperatingDays = flightOperatingDays;
-	}
-
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
+
+	public void setFlightOperatingDays(Set<DayOfWeek> operatingDays) {
+        this.flightOperatingDays = operatingDays.stream()
+                .map(Enum::name)
+                .collect(Collectors.toSet());
+    }
+
+    public Set<DayOfWeek> getFlightOperatingDays() {
+        return flightOperatingDays.stream()
+                .map(DayOfWeek::valueOf)
+                .collect(Collectors.toSet());
+    }
 
 }

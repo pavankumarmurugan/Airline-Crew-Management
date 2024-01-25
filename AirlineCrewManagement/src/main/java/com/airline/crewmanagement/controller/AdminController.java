@@ -2,13 +2,16 @@ package com.airline.crewmanagement.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.airline.crewmanagement.request.AddAirportRequest;
+import com.airline.crewmanagement.request.AddFlightRequest;
 import com.airline.crewmanagement.request.UserRegisterRequest;
 import com.airline.crewmanagement.response.UserRegisterResponse;
 import com.airline.crewmanagement.service.AdminService;
@@ -41,4 +44,17 @@ public class AdminController {
 		return ResponseEntity.ok(adminService.addAirport(addAirportRequest, token));
 	}
 
+	@PostMapping("/addFlight")
+	public ResponseEntity<?> addFlight(@Valid @RequestBody AddFlightRequest addFlightRequest,
+			@RequestHeader(name="Authorization") String token) {
+		return ResponseEntity.ok(adminService.addFlight(addFlightRequest, token));
+	}
+	
+	@GetMapping("/getFlightDetails")
+	public ResponseEntity<?> getFlightDetails(
+			@RequestParam("flightId") Long flightId,
+			@RequestHeader(name="Authorization") String token) {
+		return ResponseEntity.ok(adminService.getFlightDetails(flightId, token));
+	}
+	
 }
