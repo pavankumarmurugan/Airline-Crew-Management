@@ -62,12 +62,15 @@ public class UserEntity implements UserDetails{
     @Column(name = "user_status", nullable=false)
     private boolean userStatus = Boolean.TRUE;
     
-    @Column(name = "user_mobile_number")
+    @Column(name = "user_mobile_number", nullable=false)
     private String userMobileNumber;
     
     @ManyToOne
 	@JoinColumn(name = "user_base_location", nullable = false)
     private AirportEntity userBaseLocation;
+    
+    @Column(name = "user_experience", nullable=false)
+    private Long userExperience;
 
 	public Long getUserId() {
 		return userId;
@@ -178,6 +181,14 @@ public class UserEntity implements UserDetails{
 
 	public void setUserMobileNumber(String userMobileNumber) {
 		this.userMobileNumber = userMobileNumber;
+	}
+
+	public Long getUserExperience() {
+		return userExperience;
+	}
+
+	public void setUserExperience(Long userExperience) {
+		this.userExperience = userExperience;
 	}
     
 }
