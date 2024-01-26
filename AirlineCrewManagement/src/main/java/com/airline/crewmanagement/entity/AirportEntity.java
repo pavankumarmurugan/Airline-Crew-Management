@@ -44,6 +44,9 @@ public class AirportEntity {
 	
 	@Column(name = "airport_time_zone", nullable=false)
     private String airportTimeZone;
+	
+	@Column(name = "airport_status", nullable=false)
+	private Boolean airportStatus = Boolean.TRUE;
 
 	public Long getAirportId() {
 		return airportId;
@@ -97,4 +100,11 @@ public class AirportEntity {
 		this.airportCode = airportCode;
 	}
 
+	public Boolean getAirportStatus() {
+		return airportStatus;
+	}
+
+	public void setAirportStatus(Boolean airportStatus) {
+		this.airportStatus = airportStatus;
+	}
 }

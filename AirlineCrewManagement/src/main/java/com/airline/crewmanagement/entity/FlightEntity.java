@@ -62,6 +62,10 @@ public class FlightEntity {
 	@Column(name = "flight_operating_days", nullable=false)
     private Set<String> flightOperatingDays;
 	
+	@Column(name = "flight_status", nullable=false)
+	private Boolean flightStatus = Boolean.TRUE;
+
+	
 	public Long getFlightId() {
 		return flightId;
 	}
@@ -126,4 +130,11 @@ public class FlightEntity {
                 .collect(Collectors.toSet());
     }
 
+	public Boolean getFlightStatus() {
+		return flightStatus;
+	}
+
+	public void setFlightStatus(Boolean flightStatus) {
+		this.flightStatus = flightStatus;
+	}
 }
