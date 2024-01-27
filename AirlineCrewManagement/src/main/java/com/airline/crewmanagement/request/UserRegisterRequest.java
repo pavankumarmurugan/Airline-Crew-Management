@@ -25,6 +25,8 @@ public class UserRegisterRequest {
 	private String userMobileNumber;
 	
 	private Long userBaseLocation;
+	
+	private Long userExperience;
 
 	public String getUserFirstName() {
 		return userFirstName;
@@ -72,6 +74,14 @@ public class UserRegisterRequest {
 
 	public void setUserBaseLocation(Long userBaseLocation) {
 		this.userBaseLocation = userBaseLocation;
+	}
+
+	public Long getUserExperience() {
+		return userExperience;
+	}
+
+	public void setUserExperience(Long userExperience) {
+		this.userExperience = userExperience;
 	}
 
 }

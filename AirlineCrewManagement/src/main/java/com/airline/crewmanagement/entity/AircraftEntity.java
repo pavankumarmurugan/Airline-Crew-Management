@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
@@ -31,11 +33,18 @@ public class AircraftEntity {
 	@Column(name = "aircraft_name", nullable=false)
     private String aircraftName;
 	
+	@Column(name = "aircraft_model", nullable=false)
+    private String aircraftModel;
+	
 	@Column(name = "aircraft_seat_capacity", nullable=false)
 	private Long aircraftSeatCapacity;
 	
 	@Column(name = "aircraft_status", nullable=false)
 	private Boolean aircraftStatus = Boolean.TRUE;
+	
+	@ManyToOne
+	@JoinColumn(name = "aircraft_base_location", nullable = false)
+    private AirportEntity aircraftBaseLocation;
 
 	public Long getAircraftId() {
 		return aircraftId;
@@ -67,5 +76,21 @@ public class AircraftEntity {
 
 	public void setAircraftStatus(Boolean aircraftStatus) {
 		this.aircraftStatus = aircraftStatus;
+	}
+
+	public AirportEntity getAircraftBaseLocation() {
+		return aircraftBaseLocation;
+	}
+
+	public void setAircraftBaseLocation(AirportEntity aircraftBaseLocation) {
+		this.aircraftBaseLocation = aircraftBaseLocation;
+	}
+
+	public String getAircraftModel() {
+		return aircraftModel;
+	}
+
+	public void setAircraftModel(String aircraftModel) {
+		this.aircraftModel = aircraftModel;
 	}
 }
