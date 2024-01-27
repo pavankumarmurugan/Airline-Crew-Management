@@ -12,11 +12,9 @@ import com.airline.crewmanagement.entity.AirportEntity;
 @Transactional(readOnly = true)
 public interface AirportRepository extends JpaRepository<AirportEntity, Long> {
 	
-	Optional<AirportEntity> findByAirportId(Long airportId);
+	Optional<AirportEntity> findByAirportIdAndAirportStatusIsTrue(Long airportId);
 	
 	Optional<AirportEntity> findByAirportName(String airportName);
-	
-	Boolean existsByAirportId(Long airportId);
 	
 	Boolean existsByAirportName(String airportName);
 	

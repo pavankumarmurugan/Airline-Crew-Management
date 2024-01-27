@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.airline.crewmanagement.request.AddAircraftRequest;
 import com.airline.crewmanagement.request.AddAirportRequest;
 import com.airline.crewmanagement.request.AddFlightRequest;
 import com.airline.crewmanagement.request.UserRegisterRequest;
@@ -42,6 +43,12 @@ public class AdminController {
 	public ResponseEntity<?> addAirport(@Valid @RequestBody AddAirportRequest addAirportRequest,
 			@RequestHeader(name="Authorization") String token) {
 		return ResponseEntity.ok(adminService.addAirport(addAirportRequest, token));
+	}
+	
+	@PostMapping("/addAircraft")
+	public ResponseEntity<?> addAircraft(@Valid @RequestBody AddAircraftRequest addAircraftRequest,
+			@RequestHeader(name="Authorization") String token) {
+		return ResponseEntity.ok(adminService.addAircraft(addAircraftRequest, token));
 	}
 
 	@PostMapping("/addFlight")

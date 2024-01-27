@@ -12,6 +12,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.airline.crewmanagement.entity.AirportEntity;
 import com.airline.crewmanagement.entity.Role;
 import com.airline.crewmanagement.entity.UserEntity;
 import com.airline.crewmanagement.repository.AirportRepository;
@@ -45,17 +46,15 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public UserRegisterResponse registerUser(UserRegisterRequest userRegisterRequest, String token) {
 		
-		Optional<UserEntity> userEntity =  userRepository.findByUserEmailAndUserRole(jwtService.extractUsername(token.substring(7)), Role.ADMIN);
-
-		if (userEntity.isEmpty()) {
-			throw new IllegalArgumentException("User is not Valid");
-		}
+		checkUser(token);
 		
 		if (Boolean.TRUE.equals(userRepository.existsByUserEmail(userRegisterRequest.getUserEmail()))) {
 		    throw new IllegalArgumentException("Email is already in use!");
 		}
 		
-		if (Boolean.FALSE.equals(airportRepository.existsByAirportId(userRegisterRequest.getUserBaseLocation()))) {
+		Optional<AirportEntity> airportEntityOpt = airportRepository.findByAirportIdAndAirportStatusIsTrue(userRegisterRequest.getUserBaseLocation());
+		
+		if (airportEntityOpt.isEmpty()) {
 		    throw new IllegalArgumentException("Not valid User Base Location");
 		}
         
@@ -78,7 +77,8 @@ public class UserServiceImpl implements UserService {
         }
         
         user.setUserMobileNumber(userRegisterRequest.getUserMobileNumber());
-        user.setUserBaseLocation(airportRepository.findByAirportId(userRegisterRequest.getUserBaseLocation()).get());        
+        user.setUserBaseLocation(airportEntityOpt.get());  
+        user.setUserExperience(userRegisterRequest.getUserExperience());
         
         userRepository.save(user);
         
@@ -204,4 +204,16 @@ public class UserServiceImpl implements UserService {
                 "\n" +
                 "</div></div>";
     }
+	
+	private void checkUser(String token) {
+		
+		String userEmail = jwtService.extractUsername(token.substring(7));
+		
+		Optional<UserEntity> userEntity =  userRepository.findByUserEmailAndUserRoleAndUserStatusIsTrue(userEmail, Role.ADMIN);
+
+		if (userEntity.isEmpty()) {
+			throw new IllegalArgumentException("User is not Valid");
+		}
+		
+	}
 }

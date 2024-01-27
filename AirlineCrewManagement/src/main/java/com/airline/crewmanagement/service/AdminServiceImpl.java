@@ -12,13 +12,16 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.airline.crewmanagement.entity.AircraftEntity;
 import com.airline.crewmanagement.entity.AirportEntity;
 import com.airline.crewmanagement.entity.FlightEntity;
 import com.airline.crewmanagement.entity.Role;
 import com.airline.crewmanagement.entity.UserEntity;
+import com.airline.crewmanagement.repository.AircraftRepository;
 import com.airline.crewmanagement.repository.AirportRepository;
 import com.airline.crewmanagement.repository.FlightRepository;
 import com.airline.crewmanagement.repository.UserRepository;
+import com.airline.crewmanagement.request.AddAircraftRequest;
 import com.airline.crewmanagement.request.AddAirportRequest;
 import com.airline.crewmanagement.request.AddFlightRequest;
 
@@ -36,18 +39,17 @@ public class AdminServiceImpl implements AdminService {
 	
 	@Autowired
 	private FlightRepository flightRepository;
+	
+	@Autowired
+	private AircraftRepository aircraftRepository;
 
 	@Override
 	public Map<String, String> addAirport(AddAirportRequest addAirportRequest, String token) {
 		
-		Optional<UserEntity> userEntity =  userRepository.findByUserEmailAndUserRole(jwtService.extractUsername(token.substring(7)), Role.ADMIN);
-
-		if (userEntity.isEmpty()) {
-			throw new IllegalArgumentException("User is not Valid");
-		}
+		checkUser(token);
 		
 		if (Boolean.TRUE.equals(airportRepository.existsByAirportName(addAirportRequest.getAirportName()))) {
-		    throw new IllegalArgumentException("Airport is already in records!");
+		    throw new IllegalArgumentException("Airport Name is already in records!");
 		}
 		
 		if (Boolean.TRUE.equals(airportRepository.existsByAirportCode(addAirportRequest.getAirportCode()))) {
@@ -101,28 +103,28 @@ public class AdminServiceImpl implements AdminService {
 	@Override
 	public Map<String, String> addFlight(AddFlightRequest addFlightRequest, String token) {
 		
-		Optional<UserEntity> userEntity =  userRepository.findByUserEmailAndUserRole(jwtService.extractUsername(token.substring(7)), Role.ADMIN);
-
-		if (userEntity.isEmpty()) {
-			throw new IllegalArgumentException("User is not Valid");
-		}
+		checkUser(token);
 		
 		if(Boolean.TRUE.equals(flightRepository.existsByFlightNumber(addFlightRequest.getFlightNumber()))) {
 			throw new IllegalArgumentException("Flight Number already in records!");
 		}
 		
-		if (Boolean.FALSE.equals(airportRepository.existsByAirportId(addFlightRequest.getFlightDepartureAirport()))) {
+		Optional<AirportEntity> flightDepartureAirportEntityOpt = airportRepository.findByAirportIdAndAirportStatusIsTrue(addFlightRequest.getFlightDepartureAirport());
+		
+		if (flightDepartureAirportEntityOpt.isEmpty()) {
 		    throw new IllegalArgumentException("Flight Departure Airport is not in records!");
 		}
 		
-		if (Boolean.FALSE.equals(airportRepository.existsByAirportId(addFlightRequest.getFlightDestinationAirport()))) {
+		Optional<AirportEntity> flightDestinationAirportEntityOpt =  airportRepository.findByAirportIdAndAirportStatusIsTrue(addFlightRequest.getFlightDestinationAirport());
+		
+		if (flightDestinationAirportEntityOpt.isEmpty()) {
 		    throw new IllegalArgumentException("Flight Destination Airport is not in records!");
 		}
 		
 		FlightEntity flightEntity = new FlightEntity();
 		flightEntity.setFlightNumber(addFlightRequest.getFlightNumber());
-		flightEntity.setFlightDepartureAirport(airportRepository.findByAirportId(addFlightRequest.getFlightDepartureAirport()).get());
-		flightEntity.setFlightDestinationAirport(airportRepository.findByAirportId(addFlightRequest.getFlightDestinationAirport()).get());
+		flightEntity.setFlightDepartureAirport(flightDepartureAirportEntityOpt.get());
+		flightEntity.setFlightDestinationAirport(flightDestinationAirportEntityOpt.get());
 		flightEntity.setFlightDepartureTime(addFlightRequest.getFlightDepartureTime());
 		flightEntity.setFlightArrivalTime(addFlightRequest.getFlightArrivalTime());
 		flightEntity.setFlightOperatingDays(addFlightRequest.getFlightOperatingDays());
@@ -138,17 +140,15 @@ public class AdminServiceImpl implements AdminService {
 	@Override
 	public FlightEntity getFlightDetails(Long flightId, String token) {
 		
-		Optional<UserEntity> userEntity =  userRepository.findByUserEmailAndUserRole(jwtService.extractUsername(token.substring(7)), Role.ADMIN);
-
-		if (userEntity.isEmpty()) {
-			throw new IllegalArgumentException("User is not Valid");
-		}
+		checkUser(token);
 		
-		if(Boolean.FALSE.equals(flightRepository.existsByFlightId(flightId))) {
+		Optional<FlightEntity> flightEntityOpt = flightRepository.findByFlightId(flightId);
+		
+		if(flightEntityOpt.isEmpty()) {
 			throw new IllegalArgumentException("Flight Number is not in records!");
 		}
 		
-		FlightEntity flightEntity = flightRepository.findByFlightId(flightId).get();
+		FlightEntity flightEntity = flightEntityOpt.get();
 		
 		ZonedDateTime utcDateTime = ZonedDateTime.now(ZoneId.of("UTC"));
 		
@@ -169,6 +169,44 @@ public class AdminServiceImpl implements AdminService {
 	    flightEntity.setFlightArrivalTime(flightArrivalTime.withZoneSameInstant(arrivalZoneId).toLocalTime());
 		
 		return flightEntity;
+	}
+
+	@Override
+	public Map<String, String> addAircraft(AddAircraftRequest addAircraftRequest, String token) {
+		
+
+		checkUser(token);
+		
+		Optional<AirportEntity> airportEntityOpt = airportRepository.findByAirportIdAndAirportStatusIsTrue(
+				addAircraftRequest.getAircraftBaseLocation());
+		
+		if (airportEntityOpt.isEmpty()) {
+		    throw new IllegalArgumentException("Base Location is not in records!");
+		}
+		
+		AircraftEntity aircraftEntity = new AircraftEntity();
+		aircraftEntity.setAircraftName(addAircraftRequest.getAircraftName());
+		aircraftEntity.setAircraftModel(addAircraftRequest.getAircraftModel());
+		aircraftEntity.setAircraftSeatCapacity(addAircraftRequest.getAircraftSeatCapacity());
+		aircraftEntity.setAircraftBaseLocation(airportEntityOpt.get());
+		
+		aircraftRepository.save(aircraftEntity);
+		
+		Map<String, String> response = new HashMap<>();
+		response.put("message", "Aircraft added successfully");
+
+		return response;
+	}
+	
+	private void checkUser(String token) {
+		
+		String userEmail = jwtService.extractUsername(token.substring(7));
+		
+		Optional<UserEntity> userEntity =  userRepository.findByUserEmailAndUserRoleAndUserStatusIsTrue(userEmail, Role.ADMIN);
+
+		if (userEntity.isEmpty()) {
+			throw new IllegalArgumentException("User is not Valid");
+		}
 	}
 
 }
