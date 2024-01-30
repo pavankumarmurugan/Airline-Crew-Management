@@ -10,5 +10,7 @@ public interface AircraftRepository extends JpaRepository<AircraftEntity, Long> 
 	
 	Optional<AircraftEntity> findByAircraftId(Long aircraftId);
 	
+	Optional<AircraftEntity> findByAircraftIdAndAircraftStatusIsTrue(Long aircraftId);
+	
 	Boolean existsByAircraftId(Long aircraftId);
 }

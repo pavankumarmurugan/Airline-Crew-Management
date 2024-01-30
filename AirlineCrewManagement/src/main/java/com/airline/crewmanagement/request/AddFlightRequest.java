@@ -21,6 +21,8 @@ public class AddFlightRequest {
     private LocalTime flightArrivalTime;
 	
     private EnumSet<DayOfWeek> flightOperatingDays;
+    
+    private Long aircraftID;
 
 	public String getFlightNumber() {
 		return flightNumber;
@@ -68,6 +70,14 @@ public class AddFlightRequest {
 
 	public void setFlightOperatingDays(EnumSet<DayOfWeek> flightOperatingDays) {
 		this.flightOperatingDays = flightOperatingDays;
+	}
+
+	public Long getAircraftID() {
+		return aircraftID;
+	}
+
+	public void setAircraftID(Long aircraftID) {
+		this.aircraftID = aircraftID;
 	}
 
 }
