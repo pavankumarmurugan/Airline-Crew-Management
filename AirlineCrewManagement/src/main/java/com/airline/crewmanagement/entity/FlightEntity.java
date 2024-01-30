@@ -64,6 +64,10 @@ public class FlightEntity {
 	
 	@Column(name = "flight_status", nullable=false)
 	private Boolean flightStatus = Boolean.TRUE;
+	
+	@ManyToOne
+	@JoinColumn(name = "aircraft_id", nullable = false)
+    private AircraftEntity aircraftId;;
 
 	
 	public Long getFlightId() {
@@ -136,5 +140,13 @@ public class FlightEntity {
 
 	public void setFlightStatus(Boolean flightStatus) {
 		this.flightStatus = flightStatus;
+	}
+
+	public AircraftEntity getAircraftId() {
+		return aircraftId;
+	}
+
+	public void setAircraftId(AircraftEntity aircraftId) {
+		this.aircraftId = aircraftId;
 	}
 }

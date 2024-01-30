@@ -121,6 +121,12 @@ public class AdminServiceImpl implements AdminService {
 		    throw new IllegalArgumentException("Flight Destination Airport is not in records!");
 		}
 		
+		Optional<AircraftEntity> aircraftEntityOpt = aircraftRepository.findByAircraftIdAndAircraftStatusIsTrue(addFlightRequest.getAircraftID());
+		
+		if (aircraftEntityOpt.isEmpty()) {
+		    throw new IllegalArgumentException("Aircraft is not in records!");
+		}
+		
 		FlightEntity flightEntity = new FlightEntity();
 		flightEntity.setFlightNumber(addFlightRequest.getFlightNumber());
 		flightEntity.setFlightDepartureAirport(flightDepartureAirportEntityOpt.get());
@@ -128,6 +134,8 @@ public class AdminServiceImpl implements AdminService {
 		flightEntity.setFlightDepartureTime(addFlightRequest.getFlightDepartureTime());
 		flightEntity.setFlightArrivalTime(addFlightRequest.getFlightArrivalTime());
 		flightEntity.setFlightOperatingDays(addFlightRequest.getFlightOperatingDays());
+		flightEntity.setAircraftId(aircraftEntityOpt.get());
+		
 		
 		flightRepository.save(flightEntity);
 		
