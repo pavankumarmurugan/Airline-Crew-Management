@@ -1,6 +1,7 @@
 package com.airline.crewmanagement.service;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
@@ -127,12 +128,32 @@ public class AdminServiceImpl implements AdminService {
 		    throw new IllegalArgumentException("Aircraft is not in records!");
 		}
 		
+		ZonedDateTime departureZoneCurrentDate = ZonedDateTime.now(ZoneId.of(flightDestinationAirportEntityOpt.get().getAirportTimeZone()));
+		
+		ZonedDateTime departureZoneDateTime = ZonedDateTime.of(LocalDateTime.of(departureZoneCurrentDate.getYear(), 
+				departureZoneCurrentDate.getMonth(), departureZoneCurrentDate.getDayOfMonth(), addFlightRequest.getFlightDepartureTime().getHour(), 
+				addFlightRequest.getFlightDepartureTime().getMinute()), ZoneId.of(flightDepartureAirportEntityOpt.get().getAirportTimeZone()));
+		
+		ZonedDateTime utcDepartureDateTime = departureZoneDateTime.withZoneSameInstant(ZoneId.of("UTC"));
+		
+		LocalTime flightDepartureTime = LocalTime.of(utcDepartureDateTime.getHour(), utcDepartureDateTime.getMinute());
+		
+		ZonedDateTime arrivalZoneCurrentDate = ZonedDateTime.now(ZoneId.of(flightDestinationAirportEntityOpt.get().getAirportTimeZone()));
+		
+		ZonedDateTime arrivalZoneDateTime = ZonedDateTime.of(LocalDateTime.of(arrivalZoneCurrentDate.getYear(), 
+				arrivalZoneCurrentDate.getMonth(), arrivalZoneCurrentDate.getDayOfMonth(), addFlightRequest.getFlightArrivalTime().getHour(), 
+				addFlightRequest.getFlightArrivalTime().getMinute()), ZoneId.of(flightDestinationAirportEntityOpt.get().getAirportTimeZone()));
+		
+		ZonedDateTime utcArrivalDateTime = arrivalZoneDateTime.withZoneSameInstant(ZoneId.of("UTC"));
+		
+		LocalTime flightArrivalTime = LocalTime.of(utcArrivalDateTime.getHour(), utcArrivalDateTime.getMinute());
+		
 		FlightEntity flightEntity = new FlightEntity();
 		flightEntity.setFlightNumber(addFlightRequest.getFlightNumber());
 		flightEntity.setFlightDepartureAirport(flightDepartureAirportEntityOpt.get());
 		flightEntity.setFlightDestinationAirport(flightDestinationAirportEntityOpt.get());
-		flightEntity.setFlightDepartureTime(addFlightRequest.getFlightDepartureTime());
-		flightEntity.setFlightArrivalTime(addFlightRequest.getFlightArrivalTime());
+		flightEntity.setFlightDepartureTime(flightDepartureTime);
+		flightEntity.setFlightArrivalTime(flightArrivalTime);
 		flightEntity.setFlightOperatingDays(addFlightRequest.getFlightOperatingDays());
 		flightEntity.setAircraftId(aircraftEntityOpt.get());
 		
