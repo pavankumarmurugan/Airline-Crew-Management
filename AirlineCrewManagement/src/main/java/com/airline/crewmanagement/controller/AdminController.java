@@ -64,4 +64,10 @@ public class AdminController {
 		return ResponseEntity.ok(adminService.getFlightDetails(flightId, token));
 	}
 	
+	@GetMapping("/getAllFlightDetails")
+	public ResponseEntity<?> getAllFlightDetails(
+			@RequestHeader(name="Authorization") String token) {
+		return ResponseEntity.ok(adminService.getAllFlightDetails(token));
+	}
+	
 }

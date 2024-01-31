@@ -4,7 +4,9 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -198,6 +200,41 @@ public class AdminServiceImpl implements AdminService {
 	    flightEntity.setFlightArrivalTime(flightArrivalTime.withZoneSameInstant(arrivalZoneId).toLocalTime());
 		
 		return flightEntity;
+	}
+	
+	@Override
+	public List<FlightEntity> getAllFlightDetails(String token) {
+		
+		checkUser(token);
+		
+		List<FlightEntity> responseFlightEntityList = new ArrayList<FlightEntity>();
+		
+		List<FlightEntity> flightEntityList = flightRepository.findAll();
+		
+		for(FlightEntity flightEntity : flightEntityList) {
+			
+			ZonedDateTime utcDateTime = ZonedDateTime.now(ZoneId.of("UTC"));
+			
+			ZonedDateTime flightDepartureTime = ZonedDateTime.of(LocalDateTime.of(utcDateTime.toLocalDate().getYear(), 
+					utcDateTime.toLocalDate().getMonth(), utcDateTime.toLocalDate().getDayOfMonth(), flightEntity.getFlightDepartureTime().getHour(), 
+					flightEntity.getFlightDepartureTime().getMinute()), ZoneId.of("UTC"));
+			
+			ZoneId departureZoneId = ZoneId.of(flightEntity.getFlightDepartureAirport().getAirportTimeZone());
+		     
+		    flightEntity.setFlightDepartureTime(flightDepartureTime.withZoneSameInstant(departureZoneId).toLocalTime());
+		    
+		    ZonedDateTime flightArrivalTime = ZonedDateTime.of(LocalDateTime.of(utcDateTime.toLocalDate().getYear(), 
+					utcDateTime.toLocalDate().getMonth(), utcDateTime.toLocalDate().getDayOfMonth(), flightEntity.getFlightArrivalTime().getHour(), 
+					flightEntity.getFlightArrivalTime().getMinute()), ZoneId.of("UTC"));
+		    
+		    ZoneId arrivalZoneId = ZoneId.of(flightEntity.getFlightDestinationAirport().getAirportTimeZone());
+		    
+		    flightEntity.setFlightArrivalTime(flightArrivalTime.withZoneSameInstant(arrivalZoneId).toLocalTime());
+			
+		    responseFlightEntityList.add(flightEntity);
+		}
+		
+		return responseFlightEntityList;
 	}
 
 	@Override
