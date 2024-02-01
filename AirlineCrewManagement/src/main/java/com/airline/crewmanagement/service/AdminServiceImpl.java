@@ -1,5 +1,6 @@
 package com.airline.crewmanagement.service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -150,6 +151,34 @@ public class AdminServiceImpl implements AdminService {
 		
 		LocalTime flightArrivalTime = LocalTime.of(utcArrivalDateTime.getHour(), utcArrivalDateTime.getMinute());
 		
+		
+		for(DayOfWeek days: addFlightRequest.getFlightOperatingDays()) {
+			List<FlightEntity> flightEntityList = 
+					flightRepository.findByAircraftIdAndFlightOperatingDaysContainingAndFlightStatusIsTrue(aircraftEntityOpt.get(), days.toString());
+
+			if(!flightEntityList.isEmpty()) {
+				
+				Map<Integer, Boolean> availability = new HashMap<>();
+				
+		        for (int i = 0; i < 24; i++) { 
+		            availability.put(i, true);
+		        }
+		        
+		        for(FlightEntity flightEntity: flightEntityList) {
+		        	for (int hour = flightEntity.getFlightDepartureTime().getHour(); hour <= flightEntity.getFlightArrivalTime().getHour() + 1; hour++) {
+			            availability.put(hour, false);
+			        }	 
+		        }
+		        
+				for (int hour = flightDepartureTime.getHour(); hour <= flightArrivalTime.getHour(); hour++) {
+		            if (!availability.containsKey(hour) || !availability.get(hour)) {
+		                throw new IllegalArgumentException("Aircraft is not available for give time on " + days.toString());
+		            }
+		        }
+			}
+			
+		}
+
 		FlightEntity flightEntity = new FlightEntity();
 		flightEntity.setFlightNumber(addFlightRequest.getFlightNumber());
 		flightEntity.setFlightDepartureAirport(flightDepartureAirportEntityOpt.get());
@@ -159,7 +188,6 @@ public class AdminServiceImpl implements AdminService {
 		flightEntity.setFlightOperatingDays(addFlightRequest.getFlightOperatingDays());
 		flightEntity.setAircraftId(aircraftEntityOpt.get());
 		
-		
 		flightRepository.save(flightEntity);
 		
 		Map<String, String> response = new HashMap<>();
@@ -167,7 +195,7 @@ public class AdminServiceImpl implements AdminService {
 
 		return response;
 	}
-
+	
 	@Override
 	public FlightEntity getFlightDetails(Long flightId, String token) {
 		

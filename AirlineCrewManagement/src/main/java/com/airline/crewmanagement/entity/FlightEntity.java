@@ -67,7 +67,7 @@ public class FlightEntity {
 	
 	@ManyToOne
 	@JoinColumn(name = "aircraft_id", nullable = false)
-    private AircraftEntity aircraftId;;
+    private AircraftEntity aircraftId;
 
 	
 	public Long getFlightId() {
