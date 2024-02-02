@@ -55,6 +55,8 @@ public class RoasterScheduler {
 
 					System.out.println(flightEntity.getFlightNumber() + " A: " + arrivalDay.toString() + ": "+ flightArrivalTime.withZoneSameInstant(arrivalZoneId).toLocalDateTime()
 							+ " ");
+					
+					
 				}
 			}
 			utcDateTime = utcDateTime.plusDays(1);
