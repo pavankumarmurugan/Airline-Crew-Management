@@ -50,7 +50,7 @@ public class RoasterEntity {
 	
 	@ManyToOne
 	@JoinColumn(name = "flight_id", nullable = false)
-    private FlightEntity flight_id;
+    private FlightEntity flightId;
 	
 	@Column(name = "flight_operating_day", nullable=false)
     private String flightOperatingDay;
@@ -60,6 +60,9 @@ public class RoasterEntity {
 	
 	@Column(name = "roaster_update_date_time")
     private LocalDateTime roasterUpdateDateTime;
+	
+	@Column(name = "roaster_trip_status", nullable=false)
+    private Boolean roasterTripStatus;
 
 	public Long getRoasterId() {
 		return roasterId;
@@ -85,12 +88,12 @@ public class RoasterEntity {
 		this.flightArrivalDateTime = flightArrivalDateTime;
 	}
 
-	public FlightEntity getFlight_id() {
-		return flight_id;
+	public FlightEntity getFlightId() {
+		return flightId;
 	}
 
-	public void setFlight_id(FlightEntity flight_id) {
-		this.flight_id = flight_id;
+	public void setFlightId(FlightEntity flightId) {
+		this.flightId = flightId;
 	}
 
 	public String getFlightOperatingDay() {
@@ -137,4 +140,11 @@ public class RoasterEntity {
 		this.roasterUpdateDateTime = roasterUpdateDateTime;
 	}
 
+	public Boolean getRoasterTripStatus() {
+		return roasterTripStatus;
+	}
+
+	public void setRoasterTripStatus(Boolean roasterTripStatus) {
+		this.roasterTripStatus = roasterTripStatus;
+	}
 }

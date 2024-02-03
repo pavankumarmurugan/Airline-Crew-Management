@@ -13,7 +13,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.airline.crewmanagement.entity.FlightEntity;
+import com.airline.crewmanagement.entity.RoasterEntity;
 import com.airline.crewmanagement.repository.FlightRepository;
+import com.airline.crewmanagement.repository.RoasterRepository;
 
 //@EnableAsync
 @Service
@@ -21,12 +23,15 @@ public class RoasterScheduler {
 
 	@Autowired
 	private FlightRepository flightRepository;
+	
+	@Autowired
+	private RoasterRepository roasterRepository;
 
 	//	@Async
 	@Scheduled(cron = "0 18 22 * * ?", zone = "Europe/Dublin")
 	public Map<String, String> generateRoaster() {
 
-		List<FlightEntity> flightEntityList = flightRepository.findAll();
+		List<FlightEntity> flightEntityList = flightRepository.findByFlightStatusIsTrue();
 
 		ZonedDateTime utcDateTime = ZonedDateTime.now(ZoneId.of("UTC")).plusDays(3);
 
@@ -56,7 +61,18 @@ public class RoasterScheduler {
 					System.out.println(flightEntity.getFlightNumber() + " A: " + arrivalDay.toString() + ": "+ flightArrivalTime.withZoneSameInstant(arrivalZoneId).toLocalDateTime()
 							+ " ");
 					
+					RoasterEntity roasterEntity = new RoasterEntity();
 					
+					roasterEntity.setFlightId(flightEntity);
+					roasterEntity.setFlightDepartureAirport(flightEntity.getFlightDepartureAirport());
+					roasterEntity.setFlightDestinationAirport(flightEntity.getFlightDestinationAirport());
+					roasterEntity.setFlightDepartureDateTime(flightDepartureTime.withZoneSameInstant(departureZoneId).toLocalDateTime());
+					roasterEntity.setFlightArrivalDateTime(flightArrivalTime.withZoneSameInstant(arrivalZoneId).toLocalDateTime());
+					roasterEntity.setFlightOperatingDay(departureDay.toString());
+					roasterEntity.setRoasterTripStatus(Boolean.TRUE);
+					roasterEntity.setRoasterCreationDateTime(ZonedDateTime.now(ZoneId.of("Europe/Dublin")).withZoneSameInstant(ZoneId.of("UTC")).toLocalDateTime());
+					
+					roasterRepository.save(roasterEntity);
 				}
 			}
 			utcDateTime = utcDateTime.plusDays(1);
