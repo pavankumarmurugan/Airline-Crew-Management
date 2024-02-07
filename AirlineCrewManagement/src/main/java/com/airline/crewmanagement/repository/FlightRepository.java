@@ -29,5 +29,5 @@ public interface FlightRepository extends JpaRepository<FlightEntity, Long> {
 	
 	Boolean existsByFlightId(Long flightId);
 	
-	List<FlightEntity> findByFlightStatusIsTrue();
+	List<FlightEntity> findByFlightStatusIsTrueOrderByFlightIdAsc();
 }

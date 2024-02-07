@@ -41,7 +41,7 @@ public class RoasterScheduler {
 	//	@Async
 	@Scheduled(cron = "0 18 22 * * ?", zone = "Europe/Dublin")
 	public Map<String, String> generateRoaster() {
-		List<FlightEntity> flightEntityList = flightRepository.findByFlightStatusIsTrue();
+		List<FlightEntity> flightEntityList = flightRepository.findByFlightStatusIsTrueOrderByFlightIdAsc();
 		ZonedDateTime utcDateTime = ZonedDateTime.now(ZoneId.of("UTC")).plusDays(3);
 
 		for (int i = 1; i <= 7; i++) {
@@ -54,27 +54,39 @@ public class RoasterScheduler {
 					ZonedDateTime flightArrivalTime = getZonedDateTime(utcDateTime, flightEntity.getFlightArrivalTime(), flightEntity.getFlightDestinationAirport().getAirportTimeZone());
 
 					roasterEntity = createRoasterEntity(flightEntity, flightDepartureTime, flightArrivalTime, departureDay);
+					roasterRepository.save(roasterEntity);
+				}
+				
+			}
+			utcDateTime = utcDateTime.plusDays(1);
+		}
+		
+		for (DayOfWeek day : DayOfWeek.values()) {
+			List<RoasterEntity> roasterEntityList = roasterRepository.findByRoasterTripStatusAndFlightOperatingDayOrderByRoasterIdAsc("Created", day.toString());
+			
+			for(RoasterEntity roasterEntity: roasterEntityList) {
+				
+				FlightEntity flightEntity = roasterEntity.getFlightId();
+				
+				List<UserEntity> crewEntityList = userRepository.findByUserBaseLocationAndUserRoleAndUserStatusIsTrue(flightEntity.getFlightDepartureAirport(), Role.CREW);
 
-
-					List<UserEntity> crewEntityList = userRepository.findByUserBaseLocationAndUserRoleAndUserStatusIsTrue(flightEntity.getFlightDepartureAirport(), Role.CREW);
-
-					List<UserEntity> pilotEntityList = userRepository.findByUserBaseLocationAndUserRoleAndUserStatusIsTrue(flightEntity.getFlightDepartureAirport(), Role.PILOT);
-
+				List<UserEntity> pilotEntityList = userRepository.findByUserBaseLocationAndUserRoleAndUserStatusIsTrue(flightEntity.getFlightDepartureAirport(), Role.PILOT);
+				
+				if(crewEntityList.isEmpty() || pilotEntityList.isEmpty()) {
+					roasterEntity.setRoasterTripStatus("Cancelled");
+					roasterEntity.setRoasterComment("Not Enough Crew/Pilot to assign");
+				} else {
 					int requiredCrewSize = 0;
-					int requiredPilotSize = 0;
 
 					if (flightEntity.getAircraftId().getAircraftSeatCapacity() > 300) {
 						requiredCrewSize = 10;
-						requiredPilotSize = 2;
 					} else if (flightEntity.getAircraftId().getAircraftSeatCapacity() > 200) {
 						requiredCrewSize = 8;
-						requiredPilotSize = 2;
 					} else {
 						requiredCrewSize = 6;
-						requiredPilotSize = 2;
 					}
 
-					if (crewEntityList.size() >= requiredCrewSize && pilotEntityList.size() >= requiredPilotSize) {
+					if (crewEntityList.size() >= requiredCrewSize && pilotEntityList.size() >= 2) {
 						for (int j = 0; j < requiredCrewSize; j++) {
 							StaffAssignmentEntity staffAssignmentEntity = new StaffAssignmentEntity();
 							staffAssignmentEntity.setRoasterId(roasterEntity);
@@ -82,20 +94,21 @@ public class RoasterScheduler {
 							staffAssignmentRepository.save(staffAssignmentEntity);
 						}
 
-						for (int k = 0; k < requiredPilotSize; k++) {
+						for (int k = 0; k < 2; k++) {
 							StaffAssignmentEntity staffAssignmentEntity = new StaffAssignmentEntity();
 							staffAssignmentEntity.setRoasterId(roasterEntity);
 							staffAssignmentEntity.setUserId(pilotEntityList.get(k));
 							staffAssignmentRepository.save(staffAssignmentEntity);
 						}
+						roasterEntity.setRoasterTripStatus("Scheduled");
 					} else {
-						roasterEntity.setRoasterTripStatus(Boolean.FALSE);
+						roasterEntity.setRoasterTripStatus("Cancelled");
+						roasterEntity.setRoasterComment("Not Enough Crew/Pilot to assign");
 					}
-					roasterRepository.save(roasterEntity);
 				}
+				roasterRepository.save(roasterEntity);
 			}
-			utcDateTime = utcDateTime.plusDays(1);
-		}
+        }
 
 		Map<String, String> response = new HashMap<>();
 		response.put("message", "Roaster Generated Successfully");
@@ -114,7 +127,7 @@ public class RoasterScheduler {
 		roasterEntity.setFlightDepartureDateTime(flightDepartureTime.toLocalDateTime());
 		roasterEntity.setFlightArrivalDateTime(flightArrivalTime.toLocalDateTime());
 		roasterEntity.setFlightOperatingDay(departureDay.toString());
-		roasterEntity.setRoasterTripStatus(Boolean.TRUE);
+		roasterEntity.setRoasterTripStatus("Created");
 		roasterEntity.setRoasterCreationDateTime(ZonedDateTime.now(ZoneId.of("Europe/Dublin")).withZoneSameInstant(ZoneId.of("UTC")).toLocalDateTime());
 		return roasterEntity;
 	}

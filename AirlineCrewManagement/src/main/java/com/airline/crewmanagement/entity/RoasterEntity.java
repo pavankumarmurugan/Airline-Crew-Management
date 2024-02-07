@@ -62,7 +62,10 @@ public class RoasterEntity {
     private LocalDateTime roasterUpdateDateTime;
 	
 	@Column(name = "roaster_trip_status", nullable=false)
-    private Boolean roasterTripStatus;
+    private String roasterTripStatus;
+	
+	@Column(name = "roaster_comment")
+    private String roasterComment;
 
 	public Long getRoasterId() {
 		return roasterId;
@@ -140,11 +143,19 @@ public class RoasterEntity {
 		this.roasterUpdateDateTime = roasterUpdateDateTime;
 	}
 
-	public Boolean getRoasterTripStatus() {
+	public String getRoasterTripStatus() {
 		return roasterTripStatus;
 	}
 
-	public void setRoasterTripStatus(Boolean roasterTripStatus) {
+	public void setRoasterTripStatus(String roasterTripStatus) {
 		this.roasterTripStatus = roasterTripStatus;
+	}
+
+	public String getRoasterComment() {
+		return roasterComment;
+	}
+
+	public void setRoasterComment(String roasterComment) {
+		this.roasterComment = roasterComment;
 	}
 }
