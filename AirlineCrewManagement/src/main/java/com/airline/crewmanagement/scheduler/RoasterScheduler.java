@@ -1,6 +1,7 @@
 package com.airline.crewmanagement.scheduler;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -72,6 +73,13 @@ public class RoasterScheduler {
 
 		for (DayOfWeek day : DayOfWeek.values()) {
 			List<RoasterEntity> roasterEntityList = roasterRepository.findByRoasterTripStatusAndFlightOperatingDayOrderByRoasterIdAsc("Created", day.toString());
+			
+			LocalDate roasterDate = LocalDate.now();
+			
+			if(!roasterEntityList.isEmpty()) {
+				roasterDate = roasterEntityList.get(0).getFlightDepartureDateTime().toLocalDate();
+			}
+			
 
 			Set<Long> aircraftSet = new HashSet<>();
 			for(RoasterEntity roasterEntity: roasterEntityList) {		
@@ -97,54 +105,22 @@ public class RoasterScheduler {
 
 				List<UserEntity> crewAssignemntList = new ArrayList<>();
 				List<UserEntity> pilotAssignemntList = new ArrayList<>();
-
-				//				for(UserEntity crew : crewEntityList) {
-				//					Boolean flag = Boolean.TRUE;
-				//					for(RoasterEntity RoasterEntity : roasterEntityList) {
-				//						Optional<StaffAssignmentEntity> StaffAssignmentEntityOpl = staffAssignmentRepository.findByUserIdAndRoasterId(crew, RoasterEntity);
-				//						if(StaffAssignmentEntityOpl.isPresent()) {
-				//							flag = Boolean.FALSE;
-				//							break;
-				//						}
-				//					}
-				//					if(flag && crewAssignemntList.size() <= requiredCrewSize) {
-				//						crewAssignemntList.add(crew);
-				//					}
-				//				}
-
-				int remainingCrewCapacity = requiredCrewSize - crewAssignemntList.size();
-				if (remainingCrewCapacity > 0) {
-					crewEntityList.stream()
-					.filter(crew -> roasterEntityList.stream()
-							.noneMatch(roaster -> staffAssignmentRepository.findByUserIdAndRoasterId(crew, roaster).isPresent())
-							)
-					.limit(remainingCrewCapacity)
-					.forEach(crewAssignemntList::add);
+				
+				for(int i = 0; i < crewEntityList.size() && crewAssignemntList.size() < requiredCrewSize; i++) {
+					List<StaffAssignmentEntity> staffAssignmentEntityOpl = 
+							staffAssignmentRepository.findByUserIdAndAssignmentDateAndAssignmentDay(crewEntityList.get(i), roasterDate, day.toString());
+					if(staffAssignmentEntityOpl.isEmpty()) {
+						crewAssignemntList.add(crewEntityList.get(i));
+					}
 				}
-
-				int remainingpilotCapacity = 2 - pilotAssignemntList.size();
-				if (remainingpilotCapacity > 0) {
-					pilotEntityList.stream()
-					.filter(pilot -> roasterEntityList.stream()
-							.noneMatch(roaster -> staffAssignmentRepository.findByUserIdAndRoasterId(pilot, roaster).isPresent())
-							)
-					.limit(remainingpilotCapacity)
-					.forEach(pilotAssignemntList::add);
+				
+				for(int i = 0; i < pilotEntityList.size() && pilotAssignemntList.size() < 2; i++) {
+					List<StaffAssignmentEntity> staffAssignmentEntityOpl = 
+							staffAssignmentRepository.findByUserIdAndAssignmentDateAndAssignmentDay(pilotEntityList.get(i), roasterDate, day.toString());
+					if(staffAssignmentEntityOpl.isEmpty()) {
+						pilotAssignemntList.add(pilotEntityList.get(i));
+					}
 				}
-				//				for(UserEntity pilot : pilotEntityList) {
-				//					Boolean flag = Boolean.TRUE;
-				//					for(RoasterEntity RoasterEntity : roasterEntityList) {
-				//						Optional<StaffAssignmentEntity> StaffAssignmentEntityOpl = staffAssignmentRepository.findByUserIdAndRoasterId(pilot, RoasterEntity);
-				//						if(StaffAssignmentEntityOpl.isPresent()) {
-				//							flag = Boolean.FALSE;
-				//							break;
-				//						}
-				//					}
-				//					if(flag && pilotAssignemntList.size() <= 2) {
-				//						pilotAssignemntList.add(pilot);
-				//					}
-				//				}
-
 
 				List<FlightEntity> flightEntityListForAircraft = flightRepository.findByAircraftIdAndFlightOperatingDaysContainingAndFlightStatusIsTrue(aircraftEntityOpl.get(), day.toString());
 
@@ -159,15 +135,19 @@ public class RoasterScheduler {
 
 						for (UserEntity crew : crewAssignemntList) {
 							StaffAssignmentEntity staffAssignmentEntity = new StaffAssignmentEntity();
-							staffAssignmentEntity.setRoasterId(roasterEntityOpl.get());
+							staffAssignmentEntity.setRoasterId(roasterEntity);
 							staffAssignmentEntity.setUserId(crew);
+							staffAssignmentEntity.setAssignmentDate(roasterEntity.getFlightArrivalDateTime().toLocalDate());
+							staffAssignmentEntity.setAssignmentDay(day.toString());
 							staffAssignmentRepository.save(staffAssignmentEntity);
 						}
 
-						for (UserEntity pilot : pilotEntityList) {
+						for (UserEntity pilot : pilotAssignemntList) {
 							StaffAssignmentEntity staffAssignmentEntity = new StaffAssignmentEntity();
-							staffAssignmentEntity.setRoasterId(roasterEntityOpl.get());
+							staffAssignmentEntity.setRoasterId(roasterEntity);
 							staffAssignmentEntity.setUserId(pilot);
+							staffAssignmentEntity.setAssignmentDate(roasterEntity.getFlightArrivalDateTime().toLocalDate());
+							staffAssignmentEntity.setAssignmentDay(day.toString());
 							staffAssignmentRepository.save(staffAssignmentEntity);
 						}
 						roasterEntity.setRoasterTripStatus("Scheduled");

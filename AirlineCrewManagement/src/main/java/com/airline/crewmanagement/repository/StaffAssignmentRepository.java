@@ -1,5 +1,6 @@
 package com.airline.crewmanagement.repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +19,8 @@ public interface StaffAssignmentRepository extends JpaRepository<StaffAssignment
 	List<StaffAssignmentEntity> findByUserId(UserEntity userId);
 	
 	Optional<StaffAssignmentEntity> findByUserIdAndRoasterId(UserEntity userId, RoasterEntity roasterId);
+	
+	List<StaffAssignmentEntity> findByUserIdAndAssignmentDateAndAssignmentDay(UserEntity userId, LocalDate assignmentDate, String assignmentDay);
 
 }
 
