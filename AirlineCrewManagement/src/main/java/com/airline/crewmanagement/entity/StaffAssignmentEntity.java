@@ -1,5 +1,7 @@
 package com.airline.crewmanagement.entity;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -39,6 +41,12 @@ public class StaffAssignmentEntity {
 	@ManyToOne
 	@JoinColumn(name = "user_id", nullable = false)
     private UserEntity userId;
+	
+	@Column(name = "assignment_date")
+    private LocalDate assignmentDate;
+	
+	@Column(name = "assignment_day")
+    private String assignmentDay;
 
 	public Long getAssignmentId() {
 		return assignmentId;
@@ -66,6 +74,22 @@ public class StaffAssignmentEntity {
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
+	}
+
+	public LocalDate getAssignmentDate() {
+		return assignmentDate;
+	}
+
+	public void setAssignmentDate(LocalDate assignmentDate) {
+		this.assignmentDate = assignmentDate;
+	}
+
+	public String getAssignmentDay() {
+		return assignmentDay;
+	}
+
+	public void setAssignmentDay(String assignmentDay) {
+		this.assignmentDay = assignmentDay;
 	}
 
 }
