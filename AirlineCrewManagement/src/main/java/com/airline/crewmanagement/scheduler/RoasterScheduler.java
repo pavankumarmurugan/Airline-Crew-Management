@@ -5,13 +5,12 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -80,11 +79,9 @@ public class RoasterScheduler {
 				roasterDate = roasterEntityList.get(0).getFlightDepartureDateTime().toLocalDate();
 			}
 			
-
-			Set<Long> aircraftSet = new HashSet<>();
-			for(RoasterEntity roasterEntity: roasterEntityList) {		
-				aircraftSet.add(roasterEntity.getFlightId().getAircraftId().getAircraftId());
-			}
+			Set<Long> aircraftSet = roasterEntityList.stream()
+	                .map(roasterEntity -> roasterEntity.getFlightId().getAircraftId().getAircraftId())
+	                .collect(Collectors.toSet());
 
 			for(Long aircraftId : aircraftSet) {
 				Optional<AircraftEntity> aircraftEntityOpl = aircraftRepository.findByAircraftId(aircraftId);
@@ -102,25 +99,21 @@ public class RoasterScheduler {
 				} else {
 					requiredCrewSize = 6;
 				}
-
-				List<UserEntity> crewAssignemntList = new ArrayList<>();
-				List<UserEntity> pilotAssignemntList = new ArrayList<>();
 				
-				for(int i = 0; i < crewEntityList.size() && crewAssignemntList.size() < requiredCrewSize; i++) {
-					List<StaffAssignmentEntity> staffAssignmentEntityOpl = 
-							staffAssignmentRepository.findByUserIdAndAssignmentDateAndAssignmentDay(crewEntityList.get(i), roasterDate, day.toString());
-					if(staffAssignmentEntityOpl.isEmpty()) {
-						crewAssignemntList.add(crewEntityList.get(i));
-					}
-				}
+				List<StaffAssignmentEntity> staffAssignmentEntityList = 
+						staffAssignmentRepository.findByAssignmentDateAndAssignmentDay(roasterDate, day.toString());
 				
-				for(int i = 0; i < pilotEntityList.size() && pilotAssignemntList.size() < 2; i++) {
-					List<StaffAssignmentEntity> staffAssignmentEntityOpl = 
-							staffAssignmentRepository.findByUserIdAndAssignmentDateAndAssignmentDay(pilotEntityList.get(i), roasterDate, day.toString());
-					if(staffAssignmentEntityOpl.isEmpty()) {
-						pilotAssignemntList.add(pilotEntityList.get(i));
-					}
-				}
+				for (StaffAssignmentEntity staffAssignmentEntity : staffAssignmentEntityList) {
+		            while (crewEntityList.contains(staffAssignmentEntity.getUserId())) {
+		            	crewEntityList.remove(staffAssignmentEntity.getUserId());
+		            }
+		        }
+				
+				for (StaffAssignmentEntity staffAssignmentEntity : staffAssignmentEntityList) {
+		            while (pilotEntityList.contains(staffAssignmentEntity.getUserId())) {
+		            	pilotEntityList.remove(staffAssignmentEntity.getUserId());
+		            }
+		        }
 
 				List<FlightEntity> flightEntityListForAircraft = flightRepository.findByAircraftIdAndFlightOperatingDaysContainingAndFlightStatusIsTrue(aircraftEntityOpl.get(), day.toString());
 
@@ -130,25 +123,15 @@ public class RoasterScheduler {
 							roasterRepository.findByRoasterTripStatusAndFlightOperatingDayAndFlightId("Created", day.toString(), flightEntity);
 
 					RoasterEntity roasterEntity = roasterEntityOpl.get();
+						
+					if(crewEntityList.size() >= requiredCrewSize && pilotEntityList.size() >= 2) {
 
-					if(crewAssignemntList.size() == requiredCrewSize && pilotAssignemntList.size() == 2) {
-
-						for (UserEntity crew : crewAssignemntList) {
-							StaffAssignmentEntity staffAssignmentEntity = new StaffAssignmentEntity();
-							staffAssignmentEntity.setRoasterId(roasterEntity);
-							staffAssignmentEntity.setUserId(crew);
-							staffAssignmentEntity.setAssignmentDate(roasterEntity.getFlightArrivalDateTime().toLocalDate());
-							staffAssignmentEntity.setAssignmentDay(day.toString());
-							staffAssignmentRepository.save(staffAssignmentEntity);
+						for (int i = 0; i < requiredCrewSize; i++) {
+							generateStaffAssignmentEntity(day, crewEntityList.get(i), roasterEntity);
 						}
 
-						for (UserEntity pilot : pilotAssignemntList) {
-							StaffAssignmentEntity staffAssignmentEntity = new StaffAssignmentEntity();
-							staffAssignmentEntity.setRoasterId(roasterEntity);
-							staffAssignmentEntity.setUserId(pilot);
-							staffAssignmentEntity.setAssignmentDate(roasterEntity.getFlightArrivalDateTime().toLocalDate());
-							staffAssignmentEntity.setAssignmentDay(day.toString());
-							staffAssignmentRepository.save(staffAssignmentEntity);
+						for (int i = 0; i < 2; i++) {
+							generateStaffAssignmentEntity(day, pilotEntityList.get(i), roasterEntity);
 						}
 						roasterEntity.setRoasterTripStatus("Scheduled");
 					} else {
@@ -163,6 +146,15 @@ public class RoasterScheduler {
 		Map<String, String> response = new HashMap<>();
 		response.put("message", "Roaster Generated Successfully");
 		return response;
+	}
+
+	private void generateStaffAssignmentEntity(DayOfWeek day, UserEntity userEntity, RoasterEntity roasterEntity) {
+		StaffAssignmentEntity staffAssignmentEntity = new StaffAssignmentEntity();
+		staffAssignmentEntity.setRoasterId(roasterEntity);
+		staffAssignmentEntity.setUserId(userEntity);
+		staffAssignmentEntity.setAssignmentDate(roasterEntity.getFlightArrivalDateTime().toLocalDate());
+		staffAssignmentEntity.setAssignmentDay(day.toString());
+		staffAssignmentRepository.save(staffAssignmentEntity);
 	}
 
 	private ZonedDateTime getZonedDateTime(ZonedDateTime utcDateTime, LocalTime time, String timeZoneId) {
