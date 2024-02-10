@@ -21,6 +21,8 @@ public interface StaffAssignmentRepository extends JpaRepository<StaffAssignment
 	Optional<StaffAssignmentEntity> findByUserIdAndRoasterId(UserEntity userId, RoasterEntity roasterId);
 	
 	List<StaffAssignmentEntity> findByUserIdAndAssignmentDateAndAssignmentDay(UserEntity userId, LocalDate assignmentDate, String assignmentDay);
+	
+	List<StaffAssignmentEntity> findByAssignmentDateAndAssignmentDay(LocalDate assignmentDate, String assignmentDay);
 
 }
 
