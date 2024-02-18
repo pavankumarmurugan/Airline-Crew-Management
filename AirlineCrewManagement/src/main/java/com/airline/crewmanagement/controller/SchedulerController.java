@@ -6,19 +6,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.airline.crewmanagement.service.CrewService;
+import com.airline.crewmanagement.scheduler.RoasterScheduler;
 
 @RestController
-@RequestMapping("/api/v1/crew")
-public class CrewController {
+@RequestMapping("/api/v1/auth")
+public class SchedulerController {
 	
 	@Autowired
-	CrewService crewService;
+	private RoasterScheduler roasterScheduler;
 	
-	@GetMapping("/allCrewDetails")
-	public ResponseEntity<?> getAllCrewDetails() {
-		return ResponseEntity.ok(crewService.getAllCrewDetails());
+	@GetMapping("/generateRoaster")
+	public ResponseEntity<?> generateRoaster() {
+		return ResponseEntity.ok(roasterScheduler.generateRoaster());
 	}
 
-	
 }

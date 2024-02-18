@@ -18,12 +18,15 @@ public class UserRegisterRequest {
 	@NotEmpty(message = "Email should not be empty")
     @Email(message = "Email is not valid")
     private String userEmail;
-    
-	@NotEmpty(message = "Password should not be empty")
-    private String userPassword;
 	
-	@NotEmpty(message = "Select profile type.")
+	@NotEmpty(message = "Select profile type")
 	private String userRole;
+	
+	private String userMobileNumber;
+	
+	private Long userBaseLocation;
+	
+	private Long userExperience;
 
 	public String getUserFirstName() {
 		return userFirstName;
@@ -49,20 +52,36 @@ public class UserRegisterRequest {
 		this.userEmail = userEmail;
 	}
 
-	public String getUserPassword() {
-		return userPassword;
-	}
-
-	public void setUserPassword(String userPassword) {
-		this.userPassword = userPassword;
-	}
-
 	public String getUserRole() {
 		return userRole;
 	}
 
 	public void setUserRole(String userRole) {
 		this.userRole = userRole;
+	}
+
+	public String getUserMobileNumber() {
+		return userMobileNumber;
+	}
+
+	public void setUserMobileNumber(String userMobileNumber) {
+		this.userMobileNumber = userMobileNumber;
+	}
+
+	public Long getUserBaseLocation() {
+		return userBaseLocation;
+	}
+
+	public void setUserBaseLocation(Long userBaseLocation) {
+		this.userBaseLocation = userBaseLocation;
+	}
+
+	public Long getUserExperience() {
+		return userExperience;
+	}
+
+	public void setUserExperience(Long userExperience) {
+		this.userExperience = userExperience;
 	}
 
 }

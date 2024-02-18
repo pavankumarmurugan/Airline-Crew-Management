@@ -14,6 +14,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.Email;
@@ -58,7 +60,17 @@ public class UserEntity implements UserDetails{
     private Role userRole;
     
     @Column(name = "user_status", nullable=false)
-    private boolean userStatus = Boolean.FALSE;
+    private boolean userStatus = Boolean.TRUE;
+    
+    @Column(name = "user_mobile_number", nullable=false)
+    private String userMobileNumber;
+    
+    @ManyToOne
+	@JoinColumn(name = "user_base_location", nullable = false)
+    private AirportEntity userBaseLocation;
+    
+    @Column(name = "user_experience", nullable=false)
+    private Long userExperience;
 
 	public Long getUserId() {
 		return userId;
@@ -149,6 +161,34 @@ public class UserEntity implements UserDetails{
 	@Override
 	public boolean isEnabled() {
 		return userStatus;
+	}
+
+	public AirportEntity getUserBaseLocation() {
+		return userBaseLocation;
+	}
+
+	public void setUserBaseLocation(AirportEntity userBaseLocation) {
+		this.userBaseLocation = userBaseLocation;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+	public String getUserMobileNumber() {
+		return userMobileNumber;
+	}
+
+	public void setUserMobileNumber(String userMobileNumber) {
+		this.userMobileNumber = userMobileNumber;
+	}
+
+	public Long getUserExperience() {
+		return userExperience;
+	}
+
+	public void setUserExperience(Long userExperience) {
+		this.userExperience = userExperience;
 	}
     
 }

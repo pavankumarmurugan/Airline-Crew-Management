@@ -1,5 +1,7 @@
 package com.airline.crewmanagement.response;
 
+import com.airline.crewmanagement.entity.AirportEntity;
+
 public class UserRegisterResponse {
 	
 	private Long userId;
@@ -13,6 +15,10 @@ public class UserRegisterResponse {
     private String userPassword;
 	
 	private String userRole;
+	
+	private String userMobileNumber;
+	
+	private AirportEntity userBaseLocation;
 	
 	private String message;
 
@@ -70,6 +76,22 @@ public class UserRegisterResponse {
 
 	public void setUserRole(String userRole) {
 		this.userRole = userRole;
+	}
+
+	public String getUserMobileNumber() {
+		return userMobileNumber;
+	}
+
+	public void setUserMobileNumber(String userMobileNumber) {
+		this.userMobileNumber = userMobileNumber;
+	}
+
+	public AirportEntity getUserBaseLocation() {
+		return userBaseLocation;
+	}
+
+	public void setUserBaseLocation(AirportEntity userBaseLocation) {
+		this.userBaseLocation = userBaseLocation;
 	}
 
 }
